@@ -31,8 +31,9 @@ route.get(
       return c.json({ error: 'Not found' }, 404);
     }
 
-    // Recipient token based query.
-    let envelopeItemWhereQuery: Prisma.EnvelopeItemWhereInput = {
+    // SECURITY (EPC-112): QR token access is deprecated. A qr_ token no longer matches
+    // any envelope, so only recipient-token access resolves below.
+    const envelopeItemWhereQuery: Prisma.EnvelopeItemWhereInput = {
       id: envelopeItemId,
       documentDataId,
       envelope: {
@@ -44,18 +45,6 @@ route.get(
         },
       },
     };
-
-    // QR token based query.
-    if (token.startsWith('qr_')) {
-      envelopeItemWhereQuery = {
-        id: envelopeItemId,
-        documentDataId,
-        envelope: {
-          id: envelopeId,
-          qrToken: token,
-        },
-      };
-    }
 
     // Validate envelope access.
     const envelopeItem = await prisma.envelopeItem.findFirst({

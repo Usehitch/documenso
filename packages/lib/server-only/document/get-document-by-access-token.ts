@@ -13,6 +13,12 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
     throw new Error('Missing token');
   }
 
+  // SECURITY (EPC-112): The public QR share feature leaked signed-document PII with no auth.
+  // Refuse qr_ access tokens so every already-issued QR code stops resolving.
+  if (token.startsWith('qr_')) {
+    return null;
+  }
+
   const result = await prisma.envelope.findFirst({
     where: {
       type: EnvelopeType.DOCUMENT,

@@ -14,6 +14,7 @@ import { getTranslations } from '../../utils/i18n';
 import { getDocumentCertificateAuditLogs } from '../document/get-document-certificate-audit-logs';
 import { getOrganisationClaimByTeamId } from '../organisation/get-organisation-claims';
 import { renderCertificate } from './render-certificate';
+import { lenderDocumentsUrl } from '../../constants/app';
 
 export type GenerateCertificatePdfOptions = {
   /**
@@ -142,7 +143,7 @@ export const generateCertificatePdf = async (options: GenerateCertificatePdfOpti
       };
     }),
     envelopeOwner,
-    qrToken: envelope.qrToken,
+    documentsUrl: lenderDocumentsUrl(envelope.externalId),
     hidePoweredBy: organisationClaim.flags.hidePoweredBy ?? false,
     pageWidth,
     pageHeight,

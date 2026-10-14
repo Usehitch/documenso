@@ -43,6 +43,8 @@ services:
           envVarKey: RENDER_EXTERNAL_URL
       - key: NEXT_PRIVATE_INTERNAL_WEBAPP_URL
         value: 'http://localhost:10000'
+      - key: NEXT_PUBLIC_LENDER_APP_URL
+        sync: false
 
       # SMTP
       - key: NEXT_PRIVATE_SMTP_TRANSPORT

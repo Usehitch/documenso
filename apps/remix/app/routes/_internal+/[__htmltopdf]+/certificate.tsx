@@ -9,7 +9,7 @@ import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 import { renderSVG } from 'uqr';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { lenderDocumentsUrl } from '@documenso/lib/constants/app';
 import { APP_I18N_OPTIONS, ZSupportedLanguageCodeSchema } from '@documenso/lib/constants/i18n';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
@@ -33,7 +33,6 @@ import {
   TableRow,
 } from '@documenso/ui/primitives/table';
 
-import { BrandingLogo } from '~/components/general/branding-logo';
 
 import type { Route } from './+types/certificate';
 
@@ -88,7 +87,7 @@ export async function loader({ request }: Route.LoaderArgs) {
         name: envelope.user.name,
         email: envelope.user.email,
       },
-      qrToken: envelope.qrToken,
+      documentsUrl: lenderDocumentsUrl(envelope.externalId),
       authOptions: envelope.authOptions,
       recipients: envelope.recipients,
       createdAt: envelope.createdAt,
@@ -389,22 +388,31 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
 
       {!hidePoweredBy && (
         <div className="my-8 flex-row-reverse space-y-4">
-          <div className="flex items-end justify-end gap-x-4">
-            <div
-              className="flex h-24 w-24 justify-center"
-              dangerouslySetInnerHTML={{
-                __html: renderSVG(`${NEXT_PUBLIC_WEBAPP_URL()}/share/${document.qrToken}`, {
-                  ecc: 'Q',
-                }),
-              }}
-            />
-          </div>
+          {document.documentsUrl && (
+            <div className="flex flex-col items-end gap-y-1">
+              <div
+                className="flex h-24 w-24 justify-center"
+                dangerouslySetInnerHTML={{
+                  __html: renderSVG(document.documentsUrl, {
+                    ecc: 'Q',
+                  }),
+                }}
+              />
+              <p className="text-muted-foreground text-xs print:text-[0.6rem]">
+                {_(msg`Scan to view - sign-in required`)}
+              </p>
+            </div>
+          )}
 
           <div className="flex items-end justify-end gap-x-4">
             <p className="flex-shrink-0 text-sm font-medium print:text-xs">
               {_(msg`Signing certificate provided by`)}:
             </p>
-            <BrandingLogo className="max-h-6 print:max-h-4" />
+            <img
+              src="/static/hitch-logo.png"
+              alt="Hitch"
+              className="max-h-6 print:max-h-4"
+            />
           </div>
         </div>
       )}

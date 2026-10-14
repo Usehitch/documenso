@@ -13,6 +13,10 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
     throw new Error('Missing token');
   }
 
+  if (token.startsWith('qr_')) {
+    return null;
+  }
+
   const result = await prisma.envelope.findFirst({
     where: {
       type: EnvelopeType.DOCUMENT,

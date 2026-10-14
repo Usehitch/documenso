@@ -71,3 +71,6 @@ scripts/bench-*
 
 # tmp
 tmp/
+
+# tsx scratch dir created when running probes from packages/lib
+packages/lib/undefined/

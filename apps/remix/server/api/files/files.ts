@@ -218,7 +218,7 @@ export const filesRoute = new Hono<HonoEnv>()
     async (c) => {
       const { token, envelopeItemId } = c.req.valid('param');
 
-      let envelopeWhereQuery: Prisma.EnvelopeItemWhereUniqueInput = {
+      const envelopeWhereQuery: Prisma.EnvelopeItemWhereUniqueInput = {
         id: envelopeItemId,
         envelope: {
           recipients: {
@@ -228,15 +228,6 @@ export const filesRoute = new Hono<HonoEnv>()
           },
         },
       };
-
-      if (token.startsWith('qr_')) {
-        envelopeWhereQuery = {
-          id: envelopeItemId,
-          envelope: {
-            qrToken: token,
-          },
-        };
-      }
 
       const envelopeItem = await prisma.envelopeItem.findUnique({
         where: envelopeWhereQuery,
@@ -270,7 +261,7 @@ export const filesRoute = new Hono<HonoEnv>()
     async (c) => {
       const { token, envelopeItemId, version } = c.req.valid('param');
 
-      let envelopeWhereQuery: Prisma.EnvelopeItemWhereUniqueInput = {
+      const envelopeWhereQuery: Prisma.EnvelopeItemWhereUniqueInput = {
         id: envelopeItemId,
         envelope: {
           recipients: {
@@ -280,15 +271,6 @@ export const filesRoute = new Hono<HonoEnv>()
           },
         },
       };
-
-      if (token.startsWith('qr_')) {
-        envelopeWhereQuery = {
-          id: envelopeItemId,
-          envelope: {
-            qrToken: token,
-          },
-        };
-      }
 
       const envelopeItem = await prisma.envelopeItem.findUnique({
         where: envelopeWhereQuery,

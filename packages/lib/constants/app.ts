@@ -9,6 +9,18 @@ export const NEXT_PUBLIC_WEBAPP_URL = () =>
 export const NEXT_PUBLIC_SIGNING_CONTACT_INFO = () =>
   env('NEXT_PUBLIC_SIGNING_CONTACT_INFO') ?? NEXT_PUBLIC_WEBAPP_URL();
 
+export const NEXT_PUBLIC_LENDER_APP_URL = () => env('NEXT_PUBLIC_LENDER_APP_URL') ?? null;
+
+export const lenderDocumentsUrl = (externalId: string | null): string | null => {
+  const base = NEXT_PUBLIC_LENDER_APP_URL();
+
+  if (!base || !externalId) {
+    return null;
+  }
+
+  return `${base.replace(/\/+$/, '')}/app/documents?package=${encodeURIComponent(externalId)}`;
+};
+
 export const NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER = () =>
   env('NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER') === 'true';
 

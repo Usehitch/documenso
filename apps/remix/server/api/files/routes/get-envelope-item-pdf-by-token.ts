@@ -32,7 +32,7 @@ route.get(
     }
 
     // Recipient token based query.
-    let envelopeItemWhereQuery: Prisma.EnvelopeItemWhereInput = {
+    const envelopeItemWhereQuery: Prisma.EnvelopeItemWhereInput = {
       id: envelopeItemId,
       documentDataId,
       envelope: {
@@ -45,17 +45,6 @@ route.get(
       },
     };
 
-    // QR token based query.
-    if (token.startsWith('qr_')) {
-      envelopeItemWhereQuery = {
-        id: envelopeItemId,
-        documentDataId,
-        envelope: {
-          id: envelopeId,
-          qrToken: token,
-        },
-      };
-    }
 
     // Validate envelope access.
     const envelopeItem = await prisma.envelopeItem.findFirst({

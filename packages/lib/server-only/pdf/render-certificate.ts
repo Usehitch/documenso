@@ -13,7 +13,6 @@ import { Image as SkiaImage } from 'skia-canvas';
 import { UAParser } from 'ua-parser-js';
 import { renderSVG } from 'uqr';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { APP_I18N_OPTIONS } from '../../constants/i18n';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
@@ -49,7 +48,7 @@ export type CertificateRecipient = {
 
 type GenerateCertificateOptions = {
   recipients: CertificateRecipient[];
-  qrToken: string | null;
+  documentsUrl: string | null;
   hidePoweredBy: boolean;
   i18n: I18n;
   envelopeOwner: {
@@ -565,7 +564,13 @@ const renderRow = (options: RenderRowOptions) => {
   return rowGroup;
 };
 
-const renderBranding = async ({ qrToken, i18n }: { qrToken: string | null; i18n: I18n }) => {
+const renderBranding = async ({
+  documentsUrl,
+  i18n,
+}: {
+  documentsUrl: string | null;
+  i18n: I18n;
+}) => {
   const branding = new Konva.Group();
 
   const brandingHeight = 12;
@@ -580,31 +585,31 @@ const renderBranding = async ({ qrToken, i18n }: { qrToken: string | null; i18n:
     height: brandingHeight,
   });
 
-  const logoPath = path.join(process.cwd(), 'public/static/logo.png');
+  const logoPath = path.join(process.cwd(), 'public/static/hitch-logo.png');
   const logo = fs.readFileSync(logoPath);
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const img = new SkiaImage(logo) as unknown as HTMLImageElement;
 
-  const documensoImage = new Konva.Image({
+  const brandImage = new Konva.Image({
     image: img,
     height: brandingHeight,
     width: brandingHeight * (img.width / img.height),
     x: text.width() + 16,
   });
 
-  const qrSize = qrToken ? 72 : 0;
+  const qrSize = documentsUrl ? 72 : 0;
 
   const logoGroup = new Konva.Group({
     y: qrSize + 16,
   });
   logoGroup.add(text);
-  logoGroup.add(documensoImage);
+  logoGroup.add(brandImage);
 
   branding.add(logoGroup);
 
-  if (qrToken) {
-    const qrSvg = renderSVG(`${NEXT_PUBLIC_WEBAPP_URL()}/share/${qrToken}`, {
+  if (documentsUrl) {
+    const qrSvg = renderSVG(documentsUrl, {
       ecc: 'Q',
     });
 
@@ -620,7 +625,19 @@ const renderBranding = async ({ qrToken, i18n }: { qrToken: string | null; i18n:
       y: 0,
     });
 
+    const qrCaption = new Konva.Text({
+      text: i18n._(msg`Scan to view - sign-in required`),
+      fontFamily: 'Inter',
+      fontSize: textXs,
+      fill: textMutedForegroundLight,
+      width: qrSize,
+      align: 'center',
+      x: branding.getClientRect().width - qrSize,
+      y: qrSize + 2,
+    });
+
     branding.add(qrImage);
+    branding.add(qrCaption);
   }
 
   return branding;
@@ -717,7 +734,7 @@ const renderTables = (options: RenderTablesOptions) => {
 
 export async function renderCertificate({
   recipients,
-  qrToken,
+  documentsUrl,
   hidePoweredBy,
   i18n,
   envelopeOwner,
@@ -753,7 +770,7 @@ export async function renderCertificate({
 
   const tables = renderTables({ groupedRows, columnWidths, i18n });
 
-  const brandingGroup = await renderBranding({ qrToken, i18n });
+  const brandingGroup = await renderBranding({ documentsUrl, i18n });
   const brandingRect = brandingGroup.getClientRect();
   const brandingTopPadding = 24;
 

@@ -574,6 +574,10 @@ const renderBranding = async ({
   const branding = new Konva.Group();
 
   const brandingHeight = 12;
+  // The Documenso wordmark was 6.8:1, this one is 3.2:1 — at a shared height it reads about
+  // half as wide, so it gets its own height and is centred against the label rather than
+  // squeezed into the label's band.
+  const logoHeight = 16;
 
   const text = new Konva.Text({
     x: 0,
@@ -593,15 +597,16 @@ const renderBranding = async ({
 
   const brandImage = new Konva.Image({
     image: img,
-    height: brandingHeight,
-    width: brandingHeight * (img.width / img.height),
+    height: logoHeight,
+    width: logoHeight * (img.width / img.height),
     x: text.width() + 16,
+    y: (brandingHeight - logoHeight) / 2,
   });
 
   const qrSize = documentsUrl ? 72 : 0;
 
   const logoGroup = new Konva.Group({
-    y: qrSize + 16,
+    y: qrSize ? qrSize + 26 : 0,
   });
   logoGroup.add(text);
   logoGroup.add(brandImage);
@@ -633,7 +638,7 @@ const renderBranding = async ({
       width: qrSize,
       align: 'center',
       x: branding.getClientRect().width - qrSize,
-      y: qrSize + 2,
+      y: qrSize + 4,
     });
 
     branding.add(qrImage);

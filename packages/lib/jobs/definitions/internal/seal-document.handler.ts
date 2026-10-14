@@ -27,6 +27,10 @@ import { getCertificatePdf } from '../../../server-only/htmltopdf/get-certificat
 import { insertFieldInPDFV1 } from '../../../server-only/pdf/insert-field-in-pdf-v1';
 import { insertFieldInPDFV2 } from '../../../server-only/pdf/insert-field-in-pdf-v2';
 import { legacy_insertFieldInPDF } from '../../../server-only/pdf/legacy-insert-field-in-pdf';
+import {
+  drawSignatureIdOnEveryPage,
+  envelopeSignatureId,
+} from '../../../server-only/pdf/stamp-signature-id';
 import { getTeamSettings } from '../../../server-only/team/get-team-settings';
 import { triggerWebhook } from '../../../server-only/webhooks/trigger/trigger-webhook';
 import {
@@ -273,6 +277,7 @@ export const run = async ({
         envelope,
         envelopeItem,
         envelopeItemFields,
+        envelopeFields: fields,
         isRejected,
         rejectionReason,
         pdfData,
@@ -357,6 +362,7 @@ type DecorateAndSignPdfOptions = {
   envelope: Pick<Envelope, 'id' | 'title' | 'useLegacyFieldInsertion' | 'internalVersion'>;
   envelopeItem: EnvelopeItem & { documentData: DocumentData };
   envelopeItemFields: Field[];
+  envelopeFields: Field[];
   isRejected: boolean;
   rejectionReason: string;
   pdfData: Uint8Array;
@@ -371,6 +377,7 @@ const decorateAndSignPdf = async ({
   envelope,
   envelopeItem,
   envelopeItemFields,
+  envelopeFields,
   isRejected,
   rejectionReason,
   pdfData,
@@ -476,6 +483,15 @@ const decorateAndSignPdf = async ({
         },
       });
     }
+  }
+
+  // Stamped here, before flattening and signing, so the id the lender quotes travels
+  // inside the seal. Stamping it after the document is signed would rewrite the file
+  // and invalidate the very signature the id refers to.
+  const signatureId = envelopeSignatureId(envelopeFields);
+
+  if (signatureId) {
+    drawSignatureIdOnEveryPage(pdfDoc, signatureId);
   }
 
   // Re-flatten the form to handle our checkbox and radio fields that

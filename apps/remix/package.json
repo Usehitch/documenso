@@ -52,7 +52,7 @@
     "konva": "^10.0.9",
     "lucide-react": "^0.554.0",
     "luxon": "^3.7.2",
-    "nanoid": "^5.1.6",
+    "nanoid": "^5.1.16",
     "nuqs": "^2.8.9",
     "papaparse": "^5.5.3",
     "posthog-js": "^1.297.2",
